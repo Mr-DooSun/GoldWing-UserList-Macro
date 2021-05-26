@@ -5,8 +5,9 @@ from PIL import ImageGrab
 import numpy as np
 import cv2
 
+import re
+
 import pynput
-import pyautogui
 
 import pytesseract
 
@@ -107,21 +108,38 @@ def First_room_check(window):
 
 # 유저이름 확인
 def Check_user_name(window):
-    num = 0
     hwnd = win32gui.FindWindow(None, window)
     left, top, right, bot = win32gui.GetWindowRect(hwnd)
-    img = np.array(ImageGrab.grab((left+76, top+470, left+176, top+491)))
 
+    for num in range(1,8):
+        if num is 1 :
+            img = np.array(ImageGrab.grab((left+82, top+579, left+232, top+606)))
+        elif num is 2 :
+            img = np.array(ImageGrab.grab((left+275, top+708, left+425, top+735)))
+        elif num is 3 :
+            img = np.array(ImageGrab.grab((left+510, top+766, left+660, top+793)))
+        elif num is 4 :
+            img = np.array(ImageGrab.grab((left+750, top+772, left+900, top+802)))
+        elif num is 5 :
+            img = np.array(ImageGrab.grab((left+985, top+766, left+1135, top+793)))
+        elif num is 6 :
+            img = np.array(ImageGrab.grab((left+1225, top+706, left+1375, top+734)))
+        elif num is 7:
+            img = np.array(ImageGrab.grab((left+1418, top+576, left+1568, top+604)))
 
+        color = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        
+        color_text = pytesseract.image_to_string(color,lang="kor+eng")
+        color_text = re.sub('[^0-9a-zA-Zㄱ-힗]', '', color_text)
 
-    color = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    
-    color_text = pytesseract.image_to_string(color,lang="kor")
-    gray_text = pytesseract.image_to_string(gray,lang="kor")
+        gray_text = pytesseract.image_to_string(gray,lang="kor+eng")
+        gray_text = re.sub('[^0-9a-zA-Zㄱ-힗]', '', gray_text)
 
-    return user_name
-
+        if len(color_text) > 1 :
+            print('color :',color_text)
+        if len(gray_text) > 1 :
+            print('gray :',gray_text)
 
 
 # ======================================================================================
@@ -174,20 +192,21 @@ def Bakara_Cycle(window,bakara_name) :
                                                 Click(menu_button)
                                         break
                                 break
-
+                            
                             # 한사이클이 안돌았다면 사용자 이름 확인하기
                             else :
                                 next_button = Search_image_on_image(window,'next_button.png',0.9)
                                 if next_button is not None :
+                                    Check_user_name(window)
                                     Click(next_button)
                                     while True :
                                         next_room_button = Search_image_on_image(window,'next_room.png',0.9)
                                         if next_room_button is not None :
-                                            sleep(0.25)
+                                            # sleep(0.25)
                                             Click(next_room_button)
                                             one_cycle = True
                                             break
-                                    sleep(2)
+                                    sleep(1)
                         break
                 break
 
@@ -208,22 +227,24 @@ if __name__ == '__main__':
         window = "LDPlayer"
 
         holdom = None
-        bakara_tiger = None
-        baccarat_fabulos = None
         blackjack = None
-        baccarat_classic = None
 
-        # # 홀덤
-        # holdom = Search_image_on_image(window,'holdom.png',0.9)
-        # if holdom is not None :
-        #     Click(holdom)
+        # 홀덤
+        holdom = Search_image_on_image(window,'holdom.png',0.9)
+        if holdom is not None :
+            Click(holdom)
+            while True :
+                gold_holdom = Search_image_on_image(window,'gold_holdom.png',0.9)
+                
 
         # # 바카라 타이거6
+        # print('Baccarat Tiger Scanning ..')
         # Bakara_Cycle(window,'baccarat_tiger')
 
         # sleep(2)
 
         # # 바카라 파블로스
+        # print('Baccarat Pabulos Scanning ..')
         # Bakara_Cycle(window,'baccarat_fabulos')
 
         # sleep(2)
@@ -237,9 +258,10 @@ if __name__ == '__main__':
 
         # sleep(2)
 
-        # 마우스 드래그
-        Drag(window)
-        # 바카라 클래식
-        Bakara_Cycle(window,'baccarat_classic')
+        # # 마우스 드래그
+        # Drag(window)
+        # # 바카라 클래식
+        # print('Baccarat Cycle Scanning ..')
+        # Bakara_Cycle(window,'baccarat_classic')
         
         sleep(0.5)
