@@ -2,6 +2,7 @@ from time import sleep
 
 from Holdom_Functions import Holdom_Cycle
 from Baccarat_Functions import Bakara_Cycle
+from Common_Functions import Drag
 
 # =====================================================================================
 # =====================================================================================
