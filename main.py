@@ -18,19 +18,18 @@ if __name__ == '__main__':
         blackjack = None
 
         # # 홀덤 클릭
-        print('Holdom Scanning ..')
         Holdom_Cycle(window,'holdom')
 
         sleep(2)
 
         # 바카라 타이거6
-        print('Baccarat Tiger Scanning ..')
+        print('Baccarat Tiger 입장 중...')
         Bakara_Cycle(window,'baccarat_tiger')
 
         sleep(2)
 
         # 바카라 파블로스
-        print('Baccarat Pabulos Scanning ..')
+        print('Baccarat Pabulos 입장 중...')
         Bakara_Cycle(window,'baccarat_fabulos')
 
         sleep(2)
@@ -47,7 +46,7 @@ if __name__ == '__main__':
         # 마우스 드래그
         Drag(window)
         # 바카라 클래식
-        print('Baccarat Classic Scanning ..')
+        print('Baccarat Classic 입장 중..')
         Bakara_Cycle(window,'baccarat_classic')
         
         sleep(0.5)

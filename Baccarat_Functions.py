@@ -100,22 +100,27 @@ def Bakara_Cycle(window,bakara_name) :
             # 입장 버튼이 있다면 입장하기
             if enter is not None :
                 Click(enter)
-                
-                # 입장했는지 확인
+
+                print('입장 완료')
+                # 입장했다면 방 번호 확인
                 while True :
                     baccart_enter_check = Search_image_on_image(window,'baccart_enter_check.png',0.9)
                     if baccart_enter_check is not None :
                         sleep(2)
+                        print('바카라 처음 입장한 방 번호 등록 중...')
                         room_number = Baccarat_First_room_check(window)
                         one_cycle = False
 
                         sleep(1)
+                        print('바카라 처음 입장 방 등록 완료')
 
                         while True :
+                            print('바카라 처음 방으로 돌아왔는지 확인')
                             baccarat_room_check = Baccarat_Room_check(window,room_number,0.98)
                             
                             #한사이클 돌았다면 방 나가기
                             if baccarat_room_check is not None and one_cycle:
+                                print('바카라 스캐닝 종료 중...')
                                 while True :
                                     menu_button = Search_image_on_image(window,'baccarat_menu.png',0.9)
                                     if menu_button is not None:
@@ -147,6 +152,7 @@ def Bakara_Cycle(window,bakara_name) :
                                             next_room_button = Search_image_on_image(window,'next_room.png',0.9)
                                             if next_room_button is not None :
                                                 # sleep(0.25)
+                                                print('바카라 다음 방 이동')
                                                 Click(next_room_button)
                                                 one_cycle = True
                                                 break
@@ -158,5 +164,6 @@ def Bakara_Cycle(window,bakara_name) :
         while True :
             back_button = Search_image_on_image(window,'back.png',0.9)
             if back_button is not None :
+                print('바카라 스캐닝 종료 완료')
                 Click(back_button)
                 break
