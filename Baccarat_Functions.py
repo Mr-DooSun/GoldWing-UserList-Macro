@@ -69,7 +69,7 @@ def Baccarat_Check_user_name(window):
 
         color = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        
+
         color_text = pytesseract.image_to_string(color,lang="kor+eng")
         color_text = re.sub('[^0-9a-zA-Zㄱ-힗]', '', color_text)
 

@@ -4,23 +4,25 @@ from Holdom_Functions import Holdom_Cycle
 from Baccarat_Functions import Bakara_Cycle
 from Common_Functions import Drag
 
+import sys
+
 # =====================================================================================
 # =====================================================================================
 # =====================================================================================
+
+
 
 if __name__ == '__main__':
     room_number = None
+    window = "LDPlayer"
 
     while True :
-        window = "LDPlayer"
-
-        holdom = None
-        blackjack = None
 
         # # 홀덤 클릭
         Holdom_Cycle(window,'holdom')
 
         sleep(2)
+        
 
         # 바카라 타이거6
         print('Baccarat Tiger 입장 중...')
@@ -45,6 +47,7 @@ if __name__ == '__main__':
 
         # 마우스 드래그
         Drag(window)
+
         # 바카라 클래식
         print('Baccarat Classic 입장 중..')
         Bakara_Cycle(window,'baccarat_classic')

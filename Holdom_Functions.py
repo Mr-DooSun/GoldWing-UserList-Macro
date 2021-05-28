@@ -80,7 +80,8 @@ def Holdom_Check_user_name(window):
 
     click_list = [(350,100),(105,235),(60,490),(125,725),(600,765),(1475,675),(1540,455),(1480,225),(1240,90)]
     user_name_list = [(455,80,685,127),(251,163,481,210),(91,220,321,267),(95,460,326,507),(508,498,738,545),(1163,498,1393,545),(1177,345,1407,392),(1132,193,1362,240),(1013,83,1240,130)]
-    for num in range(1,10):
+    num = 1
+    while num < 10 :
         img = None
         start_x,start_y,end_x,end_y = user_name_list[num-1]
         # holdom 1
@@ -91,10 +92,16 @@ def Holdom_Check_user_name(window):
                 pass
             else :
                 Click(click_list[num-1])
+                sleep(1)
                 while True :
                     user_inform_check = Search_image_on_image(window,'user_inform_check.png',0.9)
                     if user_inform_check is not None :
                         img = np.array(ImageGrab.grab((left+start_x, top+start_y, left+end_x, top+end_y)))
+                        sleep(1)
+                        Click(click_list[num-1])
+                        break
+                    else :
+                        num-=1
                         break
 
         # holdom 2 이상
@@ -105,16 +112,26 @@ def Holdom_Check_user_name(window):
                 pass
             else :
                 Click(click_list[num-1])
-                Click(click_list[num-1])
+                sleep(1)
                 while True :
                     user_inform_check = Search_image_on_image(window,'user_inform_check.png',0.9)
                     if user_inform_check is not None :
                         img = np.array(ImageGrab.grab((left+start_x, top+start_y, left+end_x, top+end_y)))
+                        sleep(1)
+                        Click(click_list[num-1])
+                        break
+                    else :
+                        num-=1
                         break
         
         if img is not None : 
             color = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
             gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+            upper_blue = (200, 240, 255) # hsv 이미지에서 바이너리 이미지로 생성 , 적당한 값 30
+            lower_blue = (141, 163, 174)
+
+            img_mask = cv2.inRange(color, lower_blue, upper_blue)
             
             color_text = pytesseract.image_to_string(color,lang="kor+eng")
             color_text = re.sub('[^0-9a-zA-Zㄱ-힗]', '', color_text)
@@ -122,10 +139,17 @@ def Holdom_Check_user_name(window):
             gray_text = pytesseract.image_to_string(gray,lang="kor+eng")
             gray_text = re.sub('[^0-9a-zA-Zㄱ-힗]', '', gray_text)
 
-            if len(color_text) > 1 and len(color_text) < 9 :
-                print('color :',color_text)
-            if len(gray_text) > 1 and len(gray_text) < 9 :
-                print('gray :',gray_text)
+            img_mask_text = pytesseract.image_to_string(img_mask,lang='kor+eng')
+            img_mask_text = re.sub('[^0-9a-zA-Zㄱ-힗]', '', img_mask_text)
+
+            if len(img_mask_text) > 1 and len(img_mask_text) < 9 :
+                print('img_maks_text :',img_mask_text)
+            else : 
+                if len(color_text) > 1 and len(color_text) < 9 :
+                    print('color :',color_text)
+                if len(gray_text) > 1 and len(gray_text) < 9 :
+                    print('gray :',gray_text)
+        num += 1
 
 
 # ==================================================================================================================
