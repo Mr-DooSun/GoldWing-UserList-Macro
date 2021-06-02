@@ -89,77 +89,107 @@ def Baccarat_Check_user_name(window):
 
 
 # 바카라 타이거 사이클
-def Bakara_Cycle(window,bakara_name) :
+def Bakara_Cycle(window) :
+    # 입장 버튼이 있는지 확인
+    while True :
+        enter = Search_image_on_image(window,'enter.png',0.9)
+        # 입장 버튼이 있다면 입장하기
+        if enter is not None :
+            Click(enter)
+
+            print('입장 완료')
+            # 입장했다면 방 번호 확인
+            while True :
+                baccart_enter_check = Search_image_on_image(window,'baccart_enter_check.png',0.9)
+                if baccart_enter_check is not None :
+                    sleep(2)
+                    print('바카라 처음 입장한 방 번호 등록 중...')
+                    room_number = Baccarat_First_room_check(window)
+                    one_cycle = False
+
+                    sleep(1)
+                    print('바카라 처음 입장 방 등록 완료')
+
+                    while True :
+                        print('바카라 처음 방으로 돌아왔는지 확인')
+                        baccarat_room_check = Baccarat_Room_check(window,room_number,0.98)
+                        
+                        #한사이클 돌았다면 방 나가기
+                        if baccarat_room_check is not None and one_cycle:
+                            while True :
+                                menu_button = Search_image_on_image(window,'baccarat_menu.png',0.9)
+                                if menu_button is not None:
+                                    Click(menu_button)
+                                    sleep(1)
+                                    while True :
+                                        exit_button = Search_image_on_image(window,'baccarat_exit.png',0.9)
+                                        if exit_button is not None:
+                                            Click(exit_button)
+                                            while True :
+                                                access_button = Search_image_on_image(window,'access.png',0.9)
+                                                if access_button is not None :
+                                                    Click(access_button)
+                                                    break
+                                            break
+                                        else :
+                                            Click(menu_button)
+                                    break
+                            break
+                        
+                        # 한사이클이 안돌았다면 사용자 이름 확인하기
+                        else :
+                            while True :
+                                next_button = Search_image_on_image(window,'next_button.png',0.9)
+                                if next_button is not None :
+                                    Baccarat_Check_user_name(window)
+                                    Click(next_button)
+                                    while True :
+                                        next_room_button = Search_image_on_image(window,'next_room.png',0.9)
+                                        if next_room_button is not None :
+                                            # sleep(0.25)
+                                            print('바카라 다음 방 이동')
+                                            Click(next_room_button)
+                                            one_cycle = True
+                                            break
+                                    sleep(1)
+                                    break
+                    break
+            break
+
+def Play_baccarat(window,bakara_name,master_channel,vip_channel):
     bakara = Search_image_on_image(window,bakara_name+'.png',0.9)
     if bakara is not None :
         Click(bakara)
         
-        # 입장 버튼이 있는지 확인
-        while True :
-            enter = Search_image_on_image(window,'enter.png',0.9)
-            # 입장 버튼이 있다면 입장하기
-            if enter is not None :
-                Click(enter)
+        if master_channel :
+            while True :
+                change_channel = Search_image_on_image(window,'change_channel.png',0.9)
+                if change_channel is not None :
+                    Click(change_channel)
+                    while True :
+                        master_channel = Search_image_on_image(window,'master_channel.png',0.9)
+                        if master_channel is not None :
+                            Click(master_channel)
+                            sleep(2)
+                            break
+                    break
+            Bakara_Cycle(window)
 
-                print('입장 완료')
-                # 입장했다면 방 번호 확인
-                while True :
-                    baccart_enter_check = Search_image_on_image(window,'baccart_enter_check.png',0.9)
-                    if baccart_enter_check is not None :
-                        sleep(2)
-                        print('바카라 처음 입장한 방 번호 등록 중...')
-                        room_number = Baccarat_First_room_check(window)
-                        one_cycle = False
-
-                        sleep(1)
-                        print('바카라 처음 입장 방 등록 완료')
-
-                        while True :
-                            print('바카라 처음 방으로 돌아왔는지 확인')
-                            baccarat_room_check = Baccarat_Room_check(window,room_number,0.98)
-                            
-                            #한사이클 돌았다면 방 나가기
-                            if baccarat_room_check is not None and one_cycle:
-                                print('바카라 스캐닝 종료 중...')
-                                while True :
-                                    menu_button = Search_image_on_image(window,'baccarat_menu.png',0.9)
-                                    if menu_button is not None:
-                                        Click(menu_button)
-                                        sleep(1)
-                                        while True :
-                                            exit_button = Search_image_on_image(window,'baccarat_exit.png',0.9)
-                                            if exit_button is not None:
-                                                Click(exit_button)
-                                                while True :
-                                                    access_button = Search_image_on_image(window,'access.png',0.9)
-                                                    if access_button is not None :
-                                                        Click(access_button)
-                                                        break
-                                                break
-                                            else :
-                                                Click(menu_button)
-                                        break
-                                break
-                            
-                            # 한사이클이 안돌았다면 사용자 이름 확인하기
-                            else :
-                                while True :
-                                    next_button = Search_image_on_image(window,'next_button.png',0.9)
-                                    if next_button is not None :
-                                        Baccarat_Check_user_name(window)
-                                        Click(next_button)
-                                        while True :
-                                            next_room_button = Search_image_on_image(window,'next_room.png',0.9)
-                                            if next_room_button is not None :
-                                                # sleep(0.25)
-                                                print('바카라 다음 방 이동')
-                                                Click(next_room_button)
-                                                one_cycle = True
-                                                break
-                                        sleep(1)
-                                        break
-                        break
-                break
+        if vip_channel :
+            while True :
+                change_channel = Search_image_on_image(window,'change_channel.png',0.9)
+                if change_channel is not None :
+                    Click(change_channel)
+                    while True :
+                        vip_channel = Search_image_on_image(window,'vip_channel.png',0.9)
+                        if vip_channel is not None :
+                            Click(vip_channel)
+                            sleep(2)
+                            break
+                    break
+            Bakara_Cycle(window)
+            
+        print('바카라 스캐닝 종료 중...')
 
         while True :
             back_button = Search_image_on_image(window,'back.png',0.9)

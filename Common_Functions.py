@@ -21,7 +21,7 @@ def Click(position):
 
 # 마우스 드래그
 def Drag(window):
-    position = Search_image_on_image(window,'baccarat_fabulos.png',0.9)
+    position = Search_image_on_image(window,'baccarat_classic.png',0.9)
     if position is not None :
         from_x,from_y = position
         x = 0

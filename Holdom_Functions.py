@@ -73,6 +73,31 @@ def Sit_check(window,template,num,threshold=1):
 
     return None
 
+def Channel_check(window):
+    hwnd = win32gui.FindWindow(None, window)
+    left, top, right, bot = win32gui.GetWindowRect(hwnd)
+
+    max_channel_number = np.array(ImageGrab.grab((left+1245, top+175, left+1295, top+225)))
+    max_channel_number = cv2.cvtColor(max_channel_number,cv2.COLOR_BGR2RGB)
+
+    now_channel_number = np.array(ImageGrab.grab((left+1220, top+185, left+1240, top+215))) 
+    now_channel_number = cv2.cvtColor(now_channel_number,cv2.COLOR_BGR2RGB)
+
+    w, h = now_channel_number.shape[:-1]
+
+    try :
+        res = cv2.matchTemplate(max_channel_number, now_channel_number, cv2.TM_CCOEFF_NORMED)
+    except :
+        print('Error : Window창을 감지할 수 없습니다.')
+        return None
+
+    loc = np.where(res >= 0.9)
+
+    for pt in zip(*loc[::-1]):  # Switch collumns and rows
+        return (int(w / 2 + pt[0])+left,int(h / 2 + pt[1])+top)
+
+    return None
+
 # 홀덤 유저 이름 찾기
 def Holdom_Check_user_name(window):
     hwnd = win32gui.FindWindow(None, window)
@@ -159,7 +184,82 @@ def Holdom_Check_user_name(window):
 
 
 # 홀덤 사이클
-def Holdom_Cycle(window,holdom_name) :
+def Holdom_Cycle(window) :
+    enter_list=[(725,375),(1135,375),(1545,375),
+            (705,585),(1115,585),(1525,585),
+            (685,790),(1095,790),(1505,790)]
+    nexting = False
+    while True :
+        # 홀덤 1번째 입장하기 버튼이 있다면 클릭
+        for enter in enter_list :
+            if nexting :
+                holdom_next_channel = Search_image_on_image(window,'holdom_next_channel.png',0.9)
+                if holdom_next_channel is not None :
+                    Click(holdom_next_channel)
+                    sleep(2)
+
+            Click(enter)
+            
+            sleep(1)
+            # 홀덤 2번째 입장하기 버튼이 있다면 클릭 
+            while True :
+                enter_access = Search_image_on_image(window,'enter_access.png',0.9)
+                if enter_access is not None :
+                    Click(enter_access)
+                    print('홀덤 입장 완료')
+                    # 입장했는지 확인
+                    while True :
+                        holdom_enter_check = Search_image_on_image(window,'holdom_enter_check.png',0.9)
+                        if holdom_enter_check is not None :
+                            # 유저이름 확인
+                            Holdom_Check_user_name(window)
+                            sleep(1)
+                            # 메뉴버튼 클릭
+                            while True :
+                                menu_button = Search_image_on_image(window,'holdom_menu.png',0.9)
+                                if menu_button is not None :
+                                    Click(menu_button)
+                                    sleep(1)
+                                    # 방나가기 버튼 클릭
+                                    while True :
+                                        exit_button = Search_image_on_image(window,'holdom_exit.png',0.9)
+                                        if exit_button is not None:
+                                            Click(exit_button)
+                                            # 나가기 확인 버튼 클릭
+                                            while True :
+                                                access_button = Search_image_on_image(window,'access.png',0.9)
+                                                if access_button is not None :
+                                                    Click(access_button)
+                                                    sleep(3)
+                                                    break
+                                            break
+                                        else :
+                                            Click(menu_button)
+                                    break
+                            break
+                    break
+                not_enter = Search_image_on_image(window,'holdom_not_enter.png',0.9)
+                if not_enter is not None :
+                    Click(not_enter)
+                    sleep(2)
+                    break
+                
+                else :
+                    break
+
+        sleep(2)
+
+        if Channel_check(window) is None:
+            while True :
+                holdom_next_channel = Search_image_on_image(window,'holdom_next_channel.png',0.9)
+                if holdom_next_channel is not None :
+                    Click(holdom_next_channel)
+                    nexting = True
+                    break
+        else :
+            break
+
+def Play_holdom(window,holdom_name,master_channel,vip_channel):
     holdom = Search_image_on_image(window,holdom_name+'.png',0.9)
     if holdom is not None :
         Click(holdom)
@@ -180,91 +280,57 @@ def Holdom_Cycle(window,holdom_name) :
                         Click(chose_channel)
 
                         sleep(1)
-                        # 홀덤 1번째 입장하기 버튼이 있다면 클릭  
-                        while True :
-                            enter = Search_image_on_image(window,'enter.png',0.9)
-                            if enter is not None :
-                                Click(enter)
-                                
-                                sleep(0.5)
-                                # 홀덤 2번째 입장하기 버튼이 있다면 클릭 
-                                while True :
-                                    enter_access = Search_image_on_image(window,'enter_access.png',0.9)
-                                    if enter_access is not None :
-                                        Click(enter_access)
-                                        print('홀덤 입장 완료')
-                                        
-                                        # 홀덤 방에 제대로 입장 했다면 방번호 확인 
-                                        while True :
-                                            holdom_enter_check = Search_image_on_image(window,'holdom_enter_check.png',0.9)
-                                            if holdom_enter_check is not None :
-                                                sleep(2)
-                                                print('홀덤 처음 입장한 방 번호 등록 중..')
-                                                room_number = Holdom_First_room_check(window)
-                                                one_cycle = False
-                                                sleep(1)
-                                                print('홀덤 처음 입장 방 등록 완료')
-
-                                                # 한사이클 돌았는지 확인
-                                                while True:
-                                                    print('홀덤 처음 방으로 돌아왔는지 확인')
-                                                    holdom_room_check = Holdom_Room_check(window,room_number,0.98)
-
-                                                    # 한사이클을 돌았다면 방 나가기
-                                                    if holdom_room_check is not None and one_cycle:
-                                                        print('홀덤 스캐닝 종료 중..')
-                                                        while True :
-                                                            menu_button = Search_image_on_image(window,'holdom_menu.png',0.9)
-                                                            if menu_button is not None :
-                                                                Click(menu_button)
-                                                                sleep(1)
-                                                                while True :
-                                                                    exit_button = Search_image_on_image(window,'holdom_exit.png',0.9)
-                                                                    if exit_button is not None:
-                                                                        Click(exit_button)
-                                                                        while True :
-                                                                            access_button = Search_image_on_image(window,'access.png',0.9)
-                                                                            if access_button is not None :
-                                                                                Click(access_button)
-                                                                                break
-                                                                        break
-                                                                    else :
-                                                                        Click(menu_button)
-                                                                break
-                                                        
-                                                        break
-                                                    # 한사이클을 안돌았다면, 
-                                                    else :
-                                                        while True :
-                                                            menu_button = Search_image_on_image(window,'holdom_menu.png',0.9)
-                                                            if menu_button is not None :
-                                                                Holdom_Check_user_name(window)
-                                                                Click(menu_button)
-                                                                while True :
-                                                                    next_room_button = Search_image_on_image(window,'holdom_next_room.png',0.9)
-                                                                    if next_room_button is not None :
-                                                                        # sleep(0.25)
-                                                                        print('홀덤 다음 방 이동')
-                                                                        Click(next_room_button)
-                                                                        one_cycle = True
-                                                                        break
-                                                                sleep(1)
-                                                                break
-                                                break
-                                        break
-                                break
-                        break
-                break 
-
-        while True :
-            back_button = Search_image_on_image(window,'back.png',0.9)
-            if back_button is not None :
-                Click(back_button)
-                sleep(1)
-                while True :
-                    return_button = Search_image_on_image(window,'return.png',0.9)
-                    if return_button is not None:
-                        print('홀덤 스캐닝 종료 완료')
-                        Click(return_button)
+                        
                         break
                 break
+        
+        if master_channel :
+            while True :
+                change_channel = Search_image_on_image(window,'change_channel.png',0.9)
+                if change_channel is not None :
+                    Click(change_channel)
+                    while True :
+                        master_channel = Search_image_on_image(window,'master_channel.png',0.9)
+                        if master_channel is not None :
+                            Click(master_channel)
+                            break
+                    break
+            Holdom_Cycle(window)
+
+        if vip_channel :
+            while True :
+                change_channel = Search_image_on_image(window,'change_channel.png',0.9)
+                if change_channel is not None :
+                    Click(change_channel)
+                    while True :
+                        vip_channel = Search_image_on_image(window,'vip_channel.png',0.9)
+                        if vip_channel is not None :
+                            Click(vip_channel)
+                            break
+                    break
+            Holdom_Cycle(window)
+
+        while True :
+                back_button = Search_image_on_image(window,'back.png',0.9)
+                if back_button is not None :
+                    Click(back_button)
+                    sleep(1)
+                    while True :
+                        return_button = Search_image_on_image(window,'return.png',0.9)
+                        if return_button is not None:
+                            print('홀덤 스캐닝 종료 완료')
+                            Click(return_button)
+                            break
+                    break
+
+# window = 'LDPlayer'
+# hwnd = win32gui.FindWindow(None, window)
+# left, top, right, bot = win32gui.GetWindowRect(hwnd)
+
+# now_channel_number = np.array(ImageGrab.grab((left+1245, top+175, left+1295, top+225))) 
+# now_channel_number = cv2.cvtColor(now_channel_number,cv2.COLOR_BGR2RGB)
+
+# cv2.imshow('imgaeg',now_channel_number)
+# cv2.waitKey(0)
+
+# Holdom_Cycle('LDPlayer')
